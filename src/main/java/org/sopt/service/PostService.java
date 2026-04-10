@@ -6,6 +6,7 @@ import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.repository.PostRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostService {
@@ -27,13 +28,19 @@ public class PostService {
 
     // READ - 전체 📝 과제
     public List<PostResponse> getAllPosts() {
-        // TODO
-        return null;
+        // Post 객체 가져오기
+        List<Post> posts = postRepository.findAll();
+        // Post 객체 -> PostResponse 객체로 변환
+        List<PostResponse> responses = new ArrayList<>();
+        for (Post post: posts) {
+            responses.add(new PostResponse(post));
+        }
+        return responses;
     }
 
     // READ - 단건 📝 과제
     public PostResponse getPost(Long id) {
-        // TODO
+        postRepository.findById(id);
         return null;
     }
 
