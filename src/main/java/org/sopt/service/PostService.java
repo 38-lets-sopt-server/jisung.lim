@@ -40,17 +40,34 @@ public class PostService {
 
     // READ - 단건 📝 과제
     public PostResponse getPost(Long id) {
-        postRepository.findById(id);
-        return null;
+        Post post = postRepository.findById(id);
+        if (post == null) {
+            throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+        }
+        return new PostResponse(post);
     }
 
     // UPDATE 📝 과제
     public void updatePost(Long id, String newTitle, String newContent) {
-        // TODO
+        Post post = postRepository.findById(id);
+        if (post == null) {
+            throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+        }
+        if (newTitle.isBlank()) {
+            throw new IllegalArgumentException("제목은 필수입니다!");
+        }
+        if (newContent.isBlank()) {
+            throw new IllegalArgumentException("내용은 필수입니다!");
+        }
+        post.update(newTitle, newContent);
     }
 
     // DELETE 📝 과제
     public void deletePost(Long id) {
-        // TODO
+        Post post = postRepository.findById(id);
+        if (post == null) {
+            throw new IllegalArgumentException("존재하지 않는 게시글입니다.");
+        }
+
     }
 }
