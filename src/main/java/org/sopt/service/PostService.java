@@ -6,44 +6,48 @@ import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.repository.PostRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PostService {
     private final PostRepository postRepository = new PostRepository();
+    private final PostValidator postValidator = new PostValidator();
 
     // CREATE
     public CreatePostResponse createPost(CreatePostRequest request) {
-        if (request.title == null || request.title.isBlank()) {
-            throw new IllegalArgumentException("제목은 필수입니다!");
-        }
-        if (request.content == null || request.content.isBlank()) {
-            throw new IllegalArgumentException("내용은 필수입니다!");
-        }
+        postValidator.validateTitleAndContent(request.title, request.content);
         String createdAt = java.time.LocalDateTime.now().toString();
         Post post = new Post(postRepository.generateId(), request.title, request.content, request.author, createdAt);
         postRepository.save(post);
         return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
     }
 
-    // READ - 전체 📝 과제
+    // READ - 전체
     public List<PostResponse> getAllPosts() {
-        // TODO
-        return null;
+        List<Post> posts = postRepository.findAll();
+        List<PostResponse> responses = new ArrayList<>();
+        for (Post post : posts) {
+            responses.add(new PostResponse(post));
+        }
+        return responses;
     }
 
-    // READ - 단건 📝 과제
+    // READ - 단건
     public PostResponse getPost(Long id) {
-        // TODO
-        return null;
+        Post post = postValidator.validatePostExists(postRepository.findById(id), id);
+        return new PostResponse(post);
     }
 
-    // UPDATE 📝 과제
+    // UPDATE
     public void updatePost(Long id, String newTitle, String newContent) {
-        // TODO
+        Post post = postValidator.validatePostExists(postRepository.findById(id), id);
+        postValidator.validateTitleAndContent(newTitle, newContent);
+        post.update(newTitle, newContent);
     }
 
-    // DELETE 📝 과제
+    // DELETE
     public void deletePost(Long id) {
-        // TODO
+        postValidator.validatePostExists(postRepository.findById(id), id);
+        postRepository.deleteById(id);
     }
 }
