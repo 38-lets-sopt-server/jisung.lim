@@ -5,13 +5,27 @@ import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.repository.PostRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class PostService {
-    private final PostRepository postRepository = new PostRepository();
-    private final PostValidator postValidator = new PostValidator();
+    // 생성자에서 주입받을 참조만 선언해둠
+    // Spring이 PostService 생성자를 보고 파라미터 타입이 PostRepository, PostValidator임을 확인
+    // -> 이미 Bean으로 등록된 인스턴스를 찾아서 자동으로 넣어줌, '생성자 주입'
+    // private final -> 불변성 보장
+    private final PostRepository postRepository;
+    private final PostValidator postValidator;
+
+    // 생성자 주입 코드
+    // Spring이 PostService 인스턴스 생성 시 Bean에서 PostRepository와 PostValidator 찾아서
+    // 생성자의 파라미터에 자동 주입해줌. PostService가 스스로 new X
+    public PostService(PostRepository postRepository, PostValidator postValidator) {
+        this.postRepository = postRepository;
+        this.postValidator = postValidator;
+    }
 
     // CREATE
     public CreatePostResponse createPost(CreatePostRequest request) {
