@@ -2,6 +2,7 @@ package org.sopt.service;
 
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
+import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.repository.PostRepository;
@@ -29,9 +30,16 @@ public class PostService {
 
     // CREATE
     public CreatePostResponse createPost(CreatePostRequest request) {
-        postValidator.validateTitleAndContent(request.title, request.content);
+        // request가 record이므로 request.title()과 같이 필드값 가져옴
+        postValidator.validateTitleAndContent(request.title(), request.content());
         String createdAt = java.time.LocalDateTime.now().toString();
-        Post post = new Post(postRepository.generateId(), request.title, request.content, request.author, createdAt);
+        Post post = new Post(
+                postRepository.generateId(),
+                request.title(),
+                request.content(),
+                request.author(),
+                createdAt
+        );
         postRepository.save(post);
         return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
     }
@@ -41,7 +49,8 @@ public class PostService {
         List<Post> posts = postRepository.findAll();
         List<PostResponse> responses = new ArrayList<>();
         for (Post post : posts) {
-            responses.add(new PostResponse(post));
+            // new PostResponse(post) -> PostResponse.from(post)로 변경
+            responses.add(PostResponse.from(post));
         }
         return responses;
     }
@@ -49,14 +58,14 @@ public class PostService {
     // READ - 단건
     public PostResponse getPost(Long id) {
         Post post = postValidator.validatePostExists(postRepository.findById(id), id);
-        return new PostResponse(post);
+        return PostResponse.from(post);
     }
 
     // UPDATE
-    public void updatePost(Long id, String newTitle, String newContent) {
+    public void updatePost(Long id, UpdatePostRequest request) {
         Post post = postValidator.validatePostExists(postRepository.findById(id), id);
-        postValidator.validateTitleAndContent(newTitle, newContent);
-        post.update(newTitle, newContent);
+        postValidator.validateTitleAndContent(request.title(), request.content());
+        post.update(request.title(), request.content());
     }
 
     // DELETE
