@@ -19,8 +19,7 @@ public class GlobalExceptionHandler {
     // → 404 Not Found + 에러 메시지 반환
     @ExceptionHandler(PostNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handlePostNotFound(PostNotFoundException e) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error(404, e.getMessage()));
     }
 
@@ -29,8 +28,7 @@ public class GlobalExceptionHandler {
     // → 400 Bad Request (클라이언트가 잘못된 요청을 보냄).
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(400, e.getMessage()));
     }
 
@@ -41,8 +39,7 @@ public class GlobalExceptionHandler {
     //   (보안상 e.getMessage()를 그대로 노출하지 않고 일반 메시지 반환)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error(500, "서버 내부 오류가 발생했습니다."));
     }
 }

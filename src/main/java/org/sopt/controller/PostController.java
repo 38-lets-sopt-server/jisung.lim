@@ -33,7 +33,8 @@ public class PostController {
     public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(@RequestBody CreatePostRequest request) {
         CreatePostResponse response = postService.createPost(request);
         // ResponseEntity.status(): 원하는 상태 코드 지정 가능
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(201, "게시글 등록 완료!", response));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(201, "게시글 등록 완료!", response));
     }
 
     // GET /posts

@@ -31,15 +31,11 @@ public class PostService {
     // CREATE
     public CreatePostResponse createPost(CreatePostRequest request) {
         // request가 record이므로 request.title()과 같이 필드값 가져옴
-        postValidator.validateTitleAndContent(request.title(), request.content());
+        postValidator.validateTitleAndContent(request.title(),
+                request.content());
         String createdAt = java.time.LocalDateTime.now().toString();
-        Post post = new Post(
-                postRepository.generateId(),
-                request.title(),
-                request.content(),
-                request.author(),
-                createdAt
-        );
+        Post post = new Post(postRepository.generateId(), request.title(),
+                request.content(), request.author(), createdAt);
         postRepository.save(post);
         return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
     }
@@ -57,14 +53,17 @@ public class PostService {
 
     // READ - 단건
     public PostResponse getPost(Long id) {
-        Post post = postValidator.validatePostExists(postRepository.findById(id), id);
+        Post post = postValidator.validatePostExists(
+                postRepository.findById(id), id);
         return PostResponse.from(post);
     }
 
     // UPDATE
     public void updatePost(Long id, UpdatePostRequest request) {
-        Post post = postValidator.validatePostExists(postRepository.findById(id), id);
-        postValidator.validateTitleAndContent(request.title(), request.content());
+        Post post = postValidator.validatePostExists(
+                postRepository.findById(id), id);
+        postValidator.validateTitleAndContent(request.title(),
+                request.content());
         post.update(request.title(), request.content());
     }
 
