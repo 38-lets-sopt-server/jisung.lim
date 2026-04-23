@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 // 여기 정의한 @ExceptionHandler 메서드가 해당 예외를 가로채서 응답으로 변환.
 // (@ControllerAdvice + @ResponseBody라서 반환값이 JSON으로 자동 변환됨)
 // +) 에러 응답이나 update/delete 성공 응답은 반환할 데이터가 없음 ->
-// ApiResponse<Void>로 Void 타입을 사용해 이 자리가 비어있음을 알려줌
+// ApiResponse<Void>로 Void 타입을 사용해 ApiResponse의 data 필드가 비어있음을 알려줌
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     // PostNotFoundException 발생 시 호출

@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service // Bean으로 관리
 public class PostService {
     // 생성자에서 주입받을 참조만 선언해둠
     // Spring이 PostService 생성자를 보고 파라미터 타입이 PostRepository, PostValidator임을 확인
     // -> 이미 Bean으로 등록된 인스턴스를 찾아서 자동으로 넣어줌, '생성자 주입'
-    // private final -> 불변성 보장
+    // private final -> 불변성 보장 (+: final은 이 주소가 바뀌면 안된다는 뜻이지 객체의 내부는 변경 가능)
     private final PostRepository postRepository;
     private final PostValidator postValidator;
 

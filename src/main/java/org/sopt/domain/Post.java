@@ -15,11 +15,25 @@ public class Post {
         this.createdAt = createdAt;
     }
 
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public String getContent() { return content; }
-    public String getAuthor() { return author; }
-    public String getCreatedAt() { return createdAt; }
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
 
     public void update(String title, String content) {
         this.title = title;

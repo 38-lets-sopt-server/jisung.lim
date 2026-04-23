@@ -1,7 +1,6 @@
 package org.sopt.repository;
 
 import org.sopt.domain.Post;
-
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ public class PostRepository {
         return postList;
     }
 
+    // TODO: 반환값 optional
     public Post findById(Long id) {
         return postList.stream()
                 .filter(p -> p.getId().equals(id))

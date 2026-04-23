@@ -11,6 +11,7 @@ public record ApiResponse<T>(
     public static <T> ApiResponse<T> success(int code, String message, T data) {
         return new ApiResponse<>(code, message, data);
     }
+
     // 성공 case 2) 기본 200 + 기본 메시지 + 데이터
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse(200, "요청이 성공했습니다.", data);

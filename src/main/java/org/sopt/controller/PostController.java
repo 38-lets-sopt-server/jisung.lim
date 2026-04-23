@@ -5,7 +5,6 @@ import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
-import org.sopt.exception.PostNotFoundException;
 import org.sopt.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// RestController = Controller + ResponseBody 합본
+// @RestController = @Controller + @ResponseBody
 // 반환 객체를 자동으로 JSON으로 변환해서 HTTP 응답 Body에 실어준다
 @RestController // 이 클래스는 REST API 진입점
-@RequestMapping("/posts") // 모든 메서드는 URL 앞에 /posts 자동으로 붙임
+// 클라가 'HTTP 메서드 + URL'같은 RESTful한 요청(ex: GET /posts)을 보내면
+// Spring의 HandlerMapping이 앱 시작 시 @RequestMapping으로 만들어둔 라우팅 테이블('HTTP메서드+URL'에 일치하는 메서드가 key-value로 저장) 조회
+// -> 그 조합에 매칭되는 Controller 메서드(ex: getAllPosts)를 호출
+@RequestMapping("/posts")
 public class PostController {
     private final PostService postService;
 
@@ -30,6 +32,7 @@ public class PostController {
     @PostMapping // POST /posts 매핑
     public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(@RequestBody CreatePostRequest request) {
         CreatePostResponse response = postService.createPost(request);
+        // ResponseEntity.status(): 원하는 상태 코드 지정 가능
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(201, "게시글 등록 완료!", response));
     }
 
@@ -38,6 +41,7 @@ public class PostController {
     @GetMapping // /posts
     public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts() {
         List<PostResponse> responses = postService.getAllPosts();
+        // ResponseEntity.ok(): .status(HTTPStatus.OK)의 단축형, 200 전용
         return ResponseEntity.ok(ApiResponse.success(responses));
     }
 
