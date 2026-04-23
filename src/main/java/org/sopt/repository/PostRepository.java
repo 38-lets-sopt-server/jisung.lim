@@ -1,41 +1,36 @@
 package org.sopt.repository;
 
 import org.sopt.domain.Post;
-import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
-// @Repository -> Spring이 이 클래스를 Bean으로 등록하고 관리함
-// 앱 시작 시 Spring이 PostRepository 인스턴스를 만들어 Container에 보관
-// 이후 PostService 등이 이 인스턴스를 주입받아 사용
-@Repository
-public class PostRepository {
-    private final List<Post> postList = new ArrayList<>();
-    private Long nextId = 1L;
+/**
+ * 게시글 저장소 추상화
+ * <p>
+ * 상위 모듈(PostService)은 이 인터페이스에만 의존함으로써 DIP를 충족
+ * <p>
+ * +) 기존에는 PostService가 PostRepository 객체를 직접 참조함
+ * PostRepository는 Bean으로 등록되긴 했지만 구체 클래스 그 자체
+ * -> 따라서 Spring DI(Dependency Injection)은 적용되지만 SOLID 원칙인 DIP는 적용되지 않음
+ * => PostRepository를 interface로 바꾸고 이를 구현한 구현체(InMemoryPostRepository 등)를 선언하고
+ * PostService에서는 PostRepository 인터페이스를 참조하도록 하면 DIP 적용 완료!
+ * <p>
+ * 구현체는 여러 개일 수 있음:
+ * - InMemoryPostRepository: ArrayList 기반
+ * - DataBasePostRepository: DB 기반(3주차에 적용)
+ *
+ * @Repository 어노테이션은 인터페이스가 아니라 구현체에 붙음 (인터페이스는 인스턴스화 불가).
+ */
+public interface PostRepository {
 
-    public Post save(Post post) {
-        postList.add(post);
-        return post;
-    }
+    Post save(Post post);
 
-    public List<Post> findAll() {
-        return postList;
-    }
+    List<Post> findAll();
 
-    // TODO: 반환값 optional
-    public Post findById(Long id) {
-        return postList.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-    }
+    // TODO: 반환값 Optional<Post>로 전환 고려
+    Post findById(Long id);
 
-    public boolean deleteById(Long id) {
-        return postList.removeIf(p -> p.getId().equals(id));
-    }
+    boolean deleteById(Long id);
 
-    public Long generateId() {
-        return nextId++;
-    }
+    Long generateId();
 }
