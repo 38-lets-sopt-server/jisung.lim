@@ -1,12 +1,12 @@
 package org.sopt.controller;
 
+import org.sopt.common.SuccessCode;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.service.PostService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,22 +28,22 @@ public class PostController {
 
     // POST /posts
     // @RequestBody: 클라로부터 온 HTTP Body의 JSON을 CreatePostRequest 객체로 자동 변환
-    // ResponseEntity<T>: 상태 코드(201 Created)와 Body를 함께 반환
+    // SuccessCode 안에 status + code + message 다 들어있어서 그걸 그대로 꺼내 응답에 세팅
     @PostMapping // POST /posts 매핑
     public ResponseEntity<ApiResponse<CreatePostResponse>> createPost(@RequestBody CreatePostRequest request) {
         CreatePostResponse response = postService.createPost(request);
-        // ResponseEntity.status(): 원하는 상태 코드 지정 가능
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(201, "게시글 등록 완료!", response));
+        return ResponseEntity
+                .status(SuccessCode.POST_CREATE_SUCCESS.getStatus())
+                .body(ApiResponse.success(SuccessCode.POST_CREATE_SUCCESS, response));
     }
 
     // GET /posts
-    // 성공 시 200 OK + 게시글 리스트를 ApiResponse로 감싸서 반환
-    @GetMapping // /posts
+    @GetMapping
     public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts() {
         List<PostResponse> responses = postService.getAllPosts();
-        // ResponseEntity.ok(): .status(HTTPStatus.OK)의 단축형, 200 전용
-        return ResponseEntity.ok(ApiResponse.success(responses));
+        return ResponseEntity
+                .status(SuccessCode.POST_LIST_FETCH_SUCCESS.getStatus())
+                .body(ApiResponse.success(SuccessCode.POST_LIST_FETCH_SUCCESS, responses));
     }
 
     // GET /posts/{id}
@@ -52,22 +52,28 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable Long id) {
         PostResponse response = postService.getPost(id);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        return ResponseEntity
+                .status(SuccessCode.POST_DETAIL_FETCH_SUCCESS.getStatus())
+                .body(ApiResponse.success(SuccessCode.POST_DETAIL_FETCH_SUCCESS, response));
     }
 
     // PUT /posts/{id}
-    // 반환할 페이로드가 없으므로 data는 null, 타입은 Void.
+    // 반환할 페이로드가 없으므로 data=null 오버로드 사용
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> updatePost(@PathVariable Long id, @RequestBody UpdatePostRequest request) {
         postService.updatePost(id, request);
-        return ResponseEntity.ok(ApiResponse.success(200, "게시글 수정 완료", null));
+        return ResponseEntity
+                .status(SuccessCode.POST_UPDATE_SUCCESS.getStatus())
+                .body(ApiResponse.success(SuccessCode.POST_UPDATE_SUCCESS));
     }
 
     // DELETE /posts/{id}
-    // 위와 같은 이유로 200 OK + data=null.
+    // 위와 같은 이유로 data=null
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long id) {
         postService.deletePost(id);
-        return ResponseEntity.ok(ApiResponse.success(200, "게시글 삭제 완료", null));
+        return ResponseEntity
+                .status(SuccessCode.POST_DELETE_SUCCESS.getStatus())
+                .body(ApiResponse.success(SuccessCode.POST_DELETE_SUCCESS));
     }
 }

@@ -53,15 +53,13 @@ public class PostService {
 
     // READ - 단건
     public PostResponse getPost(Long id) {
-        Post post = postValidator.validatePostExists(
-                postRepository.findById(id), id);
+        Post post = postValidator.validatePostExists(postRepository.findById(id));
         return PostResponse.from(post);
     }
 
     // UPDATE
     public void updatePost(Long id, UpdatePostRequest request) {
-        Post post = postValidator.validatePostExists(
-                postRepository.findById(id), id);
+        Post post = postValidator.validatePostExists(postRepository.findById(id));
         postValidator.validateTitleAndContent(request.title(),
                 request.content());
         post.update(request.title(), request.content());
@@ -69,7 +67,7 @@ public class PostService {
 
     // DELETE
     public void deletePost(Long id) {
-        postValidator.validatePostExists(postRepository.findById(id), id);
+        postValidator.validatePostExists(postRepository.findById(id));
         postRepository.deleteById(id);
     }
 }
