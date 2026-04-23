@@ -1,6 +1,8 @@
 package org.sopt.service;
 
+import org.sopt.common.ErrorCode;
 import org.sopt.domain.Post;
+import org.sopt.exception.BusinessException;
 import org.sopt.exception.PostNotFoundException;
 import org.springframework.stereotype.Component;
 
@@ -17,24 +19,19 @@ public class PostValidator {
 
     public void validateTitleAndContent(String title, String content) {
         if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("제목은 필수입니다!");
+            throw new BusinessException(ErrorCode.TITLE_REQUIRED);
         }
         if (title.length() > MAX_TITLE_LENGTH) {
-            throw new IllegalArgumentException(
-                    "제목은 " + MAX_TITLE_LENGTH + "자 이하여야 합니다!");
-        }
-        if (content == null || content.isBlank()) {
-            throw new IllegalArgumentException("내용은 필수입니다!");
+            throw new BusinessException(ErrorCode.TITLE_TOO_LONG);
         }
         if (content.length() > MAX_CONTENT_LENGTH) {
-            throw new IllegalArgumentException(
-                    "내용은 " + MAX_CONTENT_LENGTH + "자 이하여야 합니다!");
+            throw new BusinessException(ErrorCode.CONTENT_TOO_LONG);
         }
     }
 
-    public Post validatePostExists(Post post, Long id) {
+    public Post validatePostExists(Post post) {
         if (post == null) {
-            throw new PostNotFoundException(id);
+            throw new PostNotFoundException();
         }
         return post;
     }

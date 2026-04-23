@@ -2,6 +2,8 @@ package org.sopt.exception;
 
 import org.sopt.common.ErrorCode;
 
+// PostNotFoundException도 그냥 BusinessException으로 처리 가능함
+// 하지만 중요한 도메인 예외는 별도의 클래스로 둔다고 함(?) -- claude
 public class PostNotFoundException extends BusinessException {
     public PostNotFoundException() {
         // 부모(BusinessException) 생성자에 ErrorCode를 넘김
