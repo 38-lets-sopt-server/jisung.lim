@@ -43,7 +43,7 @@ public class PostService {
                 request.boardType()
         );
         postRepository.save(post);
-        return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
+        return new CreatePostResponse(post.getId());
     }
 
     // READ - 전체
