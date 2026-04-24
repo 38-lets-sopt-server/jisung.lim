@@ -2,8 +2,8 @@ package org.sopt.exception;
 
 import org.sopt.common.ErrorCode;
 import org.sopt.dto.response.ApiResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -20,7 +20,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
         ErrorCode errorCode = e.getErrorCode();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(errorCode));
+        // 상태 코드는 ErrorCode가 갖고 있는 값 사용 (POST_NOT_FOUND면 404, TITLE_REQUIRED면 400 등)
+        return ResponseEntity.status(errorCode.getStatus()).body(ApiResponse.error(errorCode));
+    }
+
+    // Jackson이 JSON -> 객체 변환 실패 시 발생 (잘못된 enum값, 필수 필드 누락, 타입 불일치 등)
+    // ex: 잘못된 BoardType 전달 -> 400 Bad Request
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMessageNotReadable(
+            HttpMessageNotReadableException e) {
+        return ResponseEntity.status(ErrorCode.BAD_REQUEST.getStatus())
+                .body(ApiResponse.error(ErrorCode.BAD_REQUEST));
     }
 
     // 위에서 안 잡힌 모든 예외의 마지막 안전망
@@ -30,7 +40,8 @@ public class GlobalExceptionHandler {
     // (보안상 e.getMessage()를 그대로 노출하지 않고 일반 메시지 반환)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
     }
+
 }
