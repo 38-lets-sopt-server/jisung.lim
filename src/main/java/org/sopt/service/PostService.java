@@ -35,7 +35,7 @@ public class PostService {
                 request.content());
         String createdAt = java.time.LocalDateTime.now().toString();
         Post post = new Post(postRepository.generateId(), request.title(),
-                request.content(), request.author(), createdAt);
+                request.content(), request.author(), createdAt, request.boardType());
         postRepository.save(post);
         return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
     }

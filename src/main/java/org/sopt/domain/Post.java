@@ -1,18 +1,20 @@
 package org.sopt.domain;
 
 public class Post {
-    private Long id;          // 게시글 상세 화면 — 특정 게시글 식별용
-    private String title;     // 목록, 상세, 글쓰기 화면 — 제목
-    private String content;   // 목록(미리보기), 상세(전체) 화면 — 내용
-    private String author;    // 목록, 상세 화면 — 글쓴이
-    private String createdAt; // 목록, 상세 화면 — 작성 시각
+    private Long id;            // 게시글 상세 화면 — 특정 게시글 식별용
+    private String title;       // 목록, 상세, 글쓰기 화면 — 제목
+    private String content;     // 목록(미리보기), 상세(전체) 화면 — 내용
+    private String author;      // 목록, 상세 화면 — 글쓴이
+    private String createdAt;   // 목록, 상세 화면 — 작성 시각
+    private BoardType boardType; // 게시판 종류 (FREE / HOT / SECRET)
 
-    public Post(Long id, String title, String content, String author, String createdAt) {
+    public Post(Long id, String title, String content, String author, String createdAt, BoardType boardType) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.author = author;
         this.createdAt = createdAt;
+        this.boardType = boardType;
     }
 
     public Long getId() {
@@ -33,6 +35,10 @@ public class Post {
 
     public String getCreatedAt() {
         return createdAt;
+    }
+
+    public BoardType getBoardType() {
+        return boardType;
     }
 
     public void update(String title, String content) {
