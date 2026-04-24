@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 // @RestControllerAdvice:
 // 모든 @RestController에서 발생한 예외를 감시하는 '전역 예외 처리자'
@@ -24,11 +25,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(errorCode.getStatus()).body(ApiResponse.error(errorCode));
     }
 
-    // Jackson이 JSON -> 객체 변환 실패 시 발생 (잘못된 enum값, 필수 필드 누락, 타입 불일치 등)
-    // ex: 잘못된 BoardType 전달 -> 400 Bad Request
+    // Jackson이 HTTP Body 파싱 실패 시 발생
+    // JSON 문법 자체가 깨짐, 잘못된 enum값으로 Json -> Java 객체변환 실패, 필수 필드 누락, 타입 불일치
+    // ex: 잘못된 BoardType 전달 -> Java enum 객체로 변환 실패 -> 400 Bad Request
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<Void>> handleMessageNotReadable(
-            HttpMessageNotReadableException e) {
+            HttpMessageNotReadableException e
+    ) {
+        return ResponseEntity.status(ErrorCode.BAD_REQUEST.getStatus())
+                .body(ApiResponse.error(ErrorCode.BAD_REQUEST));
+    }
+
+    // HTTP Body 파싱 실패가 아니라, Query/Path 변수 타입 변환 실패
+    // @RequestParam, @PathVariable에 잘못된 값이 전달됐을 때 발생
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
         return ResponseEntity.status(ErrorCode.BAD_REQUEST.getStatus())
                 .body(ApiResponse.error(ErrorCode.BAD_REQUEST));
     }
