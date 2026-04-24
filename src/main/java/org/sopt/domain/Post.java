@@ -8,7 +8,14 @@ public class Post {
     private String createdAt;   // 목록, 상세 화면 — 작성 시각
     private BoardType boardType; // 게시판 종류 (FREE / HOT / SECRET)
 
-    public Post(Long id, String title, String content, String author, String createdAt, BoardType boardType) {
+    public Post(
+            Long id,
+            String title,
+            String content,
+            String author,
+            String createdAt,
+            BoardType boardType
+    ) {
         this.id = id;
         this.title = title;
         this.content = content;

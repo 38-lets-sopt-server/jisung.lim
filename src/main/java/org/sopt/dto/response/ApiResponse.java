@@ -20,27 +20,33 @@ public record ApiResponse<T>(int status, String code, String message, T data) {
     // enum + 데이터
     // ex: ApiResponse.success(SuccessCode.POST_DETAIL_FETCH_SUCCESS, postResponse)
     public static <T> ApiResponse<T> success(SuccessCode successCode, T data) {
-        return new ApiResponse<>(successCode.getStatus().value(),
+        return new ApiResponse<>(
+                successCode.getStatus().value(),
                 successCode.getCode(),
                 successCode.getMessage(),
-                data);
+                data
+        );
     }
 
     // 데이터가 없는 성공 응답 (수정/삭제 등)
     // ex: ApiResponse.success(SuccessCode.POST_DELETE_SUCCESS)
     public static <T> ApiResponse<T> success(SuccessCode successCode) {
-        return new ApiResponse<>(successCode.getStatus().value(),
+        return new ApiResponse<>(
+                successCode.getStatus().value(),
                 successCode.getCode(),
                 successCode.getMessage(),
-                null);
+                null
+        );
     }
 
     // --- 실패 응답용 정적 팩토리 ---
     // ex: ApiResponse.error(ErrorCode.POST_NOT_FOUND)
     public static <T> ApiResponse<T> error(ErrorCode errorCode) {
-        return new ApiResponse<>(errorCode.getStatus().value(),
+        return new ApiResponse<>(
+                errorCode.getStatus().value(),
                 errorCode.getCode(),
                 errorCode.getMessage(),
-                null);
+                null
+        );
     }
 }

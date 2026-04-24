@@ -8,9 +8,6 @@ import org.sopt.domain.BoardType;
 // 네 값을 받는 생성자 자동 생성
 // 각 필드에 대응하는 접근자 메서드 title(), content(), author(), boardType() 자동 생성
 public record CreatePostRequest(
-        String title,
-        String content,
-        String author,
-        BoardType boardType
+        String title, String content, String author, BoardType boardType
 ) {
 }

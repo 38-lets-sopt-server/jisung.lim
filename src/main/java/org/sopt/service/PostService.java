@@ -34,12 +34,14 @@ public class PostService {
         // request가 record이므로 request.title()과 같이 필드값 가져옴
         postValidator.validateTitleAndContent(request.title(), request.content());
         String createdAt = java.time.LocalDateTime.now().toString();
-        Post post = new Post(postRepository.generateId(),
+        Post post = new Post(
+                postRepository.generateId(),
                 request.title(),
                 request.content(),
                 request.author(),
                 createdAt,
-                request.boardType());
+                request.boardType()
+        );
         postRepository.save(post);
         return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
     }
