@@ -1,53 +1,97 @@
 package org.sopt.service;
 
+import org.sopt.domain.BoardType;
 import org.sopt.domain.Post;
 import org.sopt.dto.request.CreatePostRequest;
+import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
+import org.sopt.dto.response.PageResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.repository.PostRepository;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Service // Bean으로 관리
 public class PostService {
-    private final PostRepository postRepository = new PostRepository();
-    private final PostValidator postValidator = new PostValidator();
+    // 생성자에서 주입받을 참조만 선언해둠
+    // Spring이 PostService 생성자를 보고 파라미터 타입이 PostRepository, PostValidator임을 확인
+    // -> 이미 Bean으로 등록된 인스턴스를 찾아서 자동으로 넣어줌, '생성자 주입'
+    // private final -> 불변성 보장 (+: final은 이 주소가 바뀌면 안된다는 뜻이지 객체의 내부는 변경 가능)
+    private final PostRepository postRepository;
+    private final PostValidator postValidator;
+
+    // 생성자 주입 코드
+    // Spring이 PostService 인스턴스 생성 시 Bean에서 PostRepository와 PostValidator 찾아서
+    // 생성자의 파라미터에 자동 주입해줌. PostService가 스스로 new X
+    public PostService(PostRepository postRepository, PostValidator postValidator) {
+        this.postRepository = postRepository;
+        this.postValidator = postValidator;
+    }
 
     // CREATE
     public CreatePostResponse createPost(CreatePostRequest request) {
-        postValidator.validateTitleAndContent(request.title, request.content);
+        // request가 record이므로 request.title()과 같이 필드값 가져옴
+        postValidator.validateTitleAndContent(request.title(), request.content());
         String createdAt = java.time.LocalDateTime.now().toString();
-        Post post = new Post(postRepository.generateId(), request.title, request.content, request.author, createdAt);
+        Post post = new Post(
+                postRepository.generateId(),
+                request.title(),
+                request.content(),
+                request.author(),
+                createdAt,
+                request.boardType()
+        );
         postRepository.save(post);
-        return new CreatePostResponse(post.getId(), "게시글 등록 완료!");
+        return new CreatePostResponse(post.getId());
     }
 
     // READ - 전체
-    public List<PostResponse> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
-        List<PostResponse> responses = new ArrayList<>();
-        for (Post post : posts) {
-            responses.add(new PostResponse(post));
-        }
-        return responses;
+    public PageResponse<PostResponse> getAllPosts(int page, int size, BoardType boardType) {
+        // 1. 전체 게시글 가져오기
+        List<Post> all = postRepository.findAll();
+
+        // 2. boardType 필터링 (null이면 전체, 아니면 일치하는 게시글만)
+        // boardType == null이면 filter() 조건이 true가 되어 전체 게시글 반환
+        // boardType == 'HOT'이면 boardType == null가 false이므로
+        // p.getBoardType() == boardType을 만족하는 리스트만 반환
+        List<Post> filtered = all.stream()
+                .filter(p -> boardType == null || p.getBoardType() == boardType)
+                .toList();
+
+        // 3. 페이지 슬라이싱
+        int from = page * size;
+        int to = Math.min(from + size, filtered.size());
+        List<Post> pageSlice = from >= filtered.size() ? List.of() : filtered.subList(from, to);
+
+        // 4. DTO 반환
+        List<PostResponse> content = pageSlice.stream().map(PostResponse::from).toList();
+
+        // 5. hasNext 계산 (다음 페이지 존재 여부)
+        boolean hasNext = to < filtered.size();
+
+        // 6. PageResponse 생성
+        // 요청/응답 순간에만 존재, 불변(상태 없음), 매 요청마다 다른 데이터로 새로 만들어지는게 정상, Spring이 관리할 필요 없음
+        // => Spring DI의 관리 대상 X, new 사용하는게 당연함
+        return new PageResponse<PostResponse>(content, page, size, hasNext);
     }
 
     // READ - 단건
     public PostResponse getPost(Long id) {
-        Post post = postValidator.validatePostExists(postRepository.findById(id), id);
-        return new PostResponse(post);
+        Post post = postValidator.validatePostExists(postRepository.findById(id));
+        return PostResponse.from(post);
     }
 
     // UPDATE
-    public void updatePost(Long id, String newTitle, String newContent) {
-        Post post = postValidator.validatePostExists(postRepository.findById(id), id);
-        postValidator.validateTitleAndContent(newTitle, newContent);
-        post.update(newTitle, newContent);
+    public void updatePost(Long id, UpdatePostRequest request) {
+        Post post = postValidator.validatePostExists(postRepository.findById(id));
+        postValidator.validateTitleAndContent(request.title(), request.content());
+        post.update(request.title(), request.content());
     }
 
     // DELETE
     public void deletePost(Long id) {
-        postValidator.validatePostExists(postRepository.findById(id), id);
+        postValidator.validatePostExists(postRepository.findById(id));
         postRepository.deleteById(id);
     }
 }

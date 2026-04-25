@@ -1,15 +1,13 @@
 package org.sopt.dto.request;
 
-// 게시글 작성 요청 (클라이언트 → 서버)
-// 변수 앞에 아무것도 안붙으면 default(해당 패키지 내에서만 접근 가능)
-public class CreatePostRequest {
-    public String title;
-    public String content;
-    public String author;
+import org.sopt.domain.BoardType;
 
-    public CreatePostRequest(String title, String content, String author) {
-        this.title = title;
-        this.content = content;
-        this.author = author;
-    }
+// 게시글 작성 요청 (클라이언트 → 서버)
+// record: 데이터만 담는 불변 객체를 한 줄로 선언 가능!
+// title, content, author, boardType을 final 필드로 선언(불변)
+// 네 값을 받는 생성자 자동 생성
+// 각 필드에 대응하는 접근자 메서드 title(), content(), author(), boardType() 자동 생성
+public record CreatePostRequest(
+        String title, String content, String author, BoardType boardType
+) {
 }
