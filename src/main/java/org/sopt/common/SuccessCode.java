@@ -18,7 +18,9 @@ public enum SuccessCode {
     POST_DETAIL_FETCH_SUCCESS(HttpStatus.OK, "게시글 조회에 성공했습니다."),
     POST_CREATE_SUCCESS(HttpStatus.CREATED, "게시글이 성공적으로 등록되었습니다."),
     POST_UPDATE_SUCCESS(HttpStatus.OK, "게시글이 성공적으로 수정되었습니다."),
-    POST_DELETE_SUCCESS(HttpStatus.OK, "게시글이 삭제되었습니다.");
+    POST_DELETE_SUCCESS(HttpStatus.OK, "게시글이 삭제되었습니다."),
+    POST_LIKE_CREATE_SUCCESS(HttpStatus.CREATED, "게시물 좋아요에 성공했습니다."),
+    POST_LIKE_DELETE_SUCCESS(HttpStatus.OK, "게시물 좋아요 해제에 성공했습니다.");
 
     private final HttpStatus status;
     private final String message;
