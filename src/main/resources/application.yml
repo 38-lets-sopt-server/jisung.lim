@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: assignment
+
+  datasource:
+    # localhost:3306 = 이 컴퓨터에 떠 있는 MySQL 서버
+    # /assignment = 그 서버 안의 'assignment' 데이터베이스
+    url: jdbc:mysql://localhost:3306/assignment
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      # update: 변경된 부분만 반영, 기존 데이터 유지
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        # 콘솔에 출력되는 SQL을 보기 좋게 정렬
+        format_sql: true
+    # 실행되는 SQL 쿼리를 콘솔에 출력
+    show-sql: true
