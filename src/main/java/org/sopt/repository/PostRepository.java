@@ -2,9 +2,7 @@ package org.sopt.repository;
 
 import org.sopt.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
     // JpaRepository를 상속하면서 기존 2차과제 코드에서 Repository에 구현했던
     // save(), findById(), deleteById() 등의 CRUD 메서드가 불필요해짐
