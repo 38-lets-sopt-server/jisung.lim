@@ -66,7 +66,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public PageResponse<PostResponse> getAllPosts(int page, int size, BoardType boardType) {
         // 1. 전체 게시글 가져오기
-        List<Post> all = postRepository.findAll();
+        List<Post> all = postRepository.findAllWithUserAndLikes();
 
         // 2. boardType 필터링 (null이면 전체, 아니면 일치하는 게시글만)
         // boardType == null이면 filter() 조건이 true가 되어 전체 게시글 반환
