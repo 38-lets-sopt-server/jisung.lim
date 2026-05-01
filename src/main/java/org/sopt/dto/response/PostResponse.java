@@ -9,23 +9,19 @@ import java.time.LocalDateTime;
 // 게시글 조회 응답 (서버 → 클라이언트)
 @Schema(description = "게시글 조회 응답")
 public record PostResponse(
-        @Schema(description = "게시글 ID", example = "1")
-        Long id,
+        @Schema(description = "게시글 ID", example = "1") Long id,
 
-        @Schema(description = "게시글 제목", example = "오늘 학식 뭐임")
-        String title,
+        @Schema(description = "게시글 제목", example = "오늘 학식 뭐임") String title,
 
-        @Schema(description = "게시글 내용", example = "돈까스래")
-        String content,
+        @Schema(description = "게시글 내용", example = "돈까스래") String content,
 
-        @Schema(description = "작성자 닉네임", example = "테스트유저")
-        String nickname,
+        @Schema(description = "작성자 닉네임", example = "테스트유저") String nickname,
 
-        @Schema(description = "작성 시각", example = "2026-05-01T17:30:00")
-        LocalDateTime createdAt,
+        @Schema(description = "작성 시각", example = "2026-05-01T17:30:00") LocalDateTime createdAt,
 
-        @Schema(description = "게시판 종류", example = "FREE")
-        BoardType boardType
+        @Schema(description = "게시판 종류", example = "FREE") BoardType boardType,
+
+        @Schema(description = "좋아요 수", example = "5") int likeCount
 ) {
     // 2주차
     // 정적 팩토리 메서드: Post 도메인 객체를 PostResponse로 변환
@@ -43,7 +39,8 @@ public record PostResponse(
                 post.getContent(),
                 post.getUser().getNickname(),
                 post.getCreatedAt(),
-                post.getBoardType()
+                post.getBoardType(),
+                post.getLikes().size()
         );
     }
 }
