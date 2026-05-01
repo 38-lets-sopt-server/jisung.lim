@@ -1,5 +1,6 @@
 package org.sopt.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.sopt.common.ErrorCode;
 import org.sopt.common.SuccessCode;
 
@@ -18,7 +19,20 @@ import org.sopt.common.SuccessCode;
  * Swagger의 io.swagger.v3.oas.annotations.responses.ApiResponse 어노테이션과
  * 같은 파일에서 동시에 import할 수 없기 때문이다.
  */
-public record BaseResponse<T>(int status, String code, String message, T data) {
+@Schema(description = "공통 응답 wrapper")
+public record BaseResponse<T>(
+        @Schema(description = "HTTP 상태 코드", example = "200")
+        int status,
+
+        @Schema(description = "비즈니스 코드", example = "POST_DETAIL_FETCH_SUCCESS")
+        String code,
+
+        @Schema(description = "응답 메시지", example = "게시글 조회에 성공했습니다.")
+        String message,
+
+        @Schema(description = "응답 데이터")
+        T data
+) {
 
     // --- 성공 응답용 정적 팩토리 ---
     // enum + 데이터
