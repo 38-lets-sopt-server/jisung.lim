@@ -1,14 +1,13 @@
 package org.sopt.service;
 
 import org.sopt.common.ErrorCode;
-import org.sopt.domain.Post;
 import org.sopt.exception.BusinessException;
-import org.sopt.exception.PostNotFoundException;
 import org.springframework.stereotype.Component;
 
-// @Repository, @Service, @Controller 등의 어노테이션이 있음
-// Validator는 저장소/Service/Controller 모두 아님 -> 범용 Bean으로
-// 등록할 때 쓰는 @Component가 적절, 기능은 다른 어노테이션과 동일(Spring Bean으로 등록, 필요한 곳에 주입)
+// @Component: 범용 Spring Bean으로 등록
+//   Repository/Service/Controller 어디에도 속하지 않는 보조 컴포넌트라 @Component 사용
+//   기능은 다른 어노테이션과 동일(Bean 등록 + DI 대상)
+//
 // PostService가 new PostValidator()를 버리고 생성자 주입으로 PostValidator를 받으려면
 // PostValidator도 Spring이 관리하는 Bean이어야 함
 @Component
@@ -27,12 +26,5 @@ public class PostValidator {
         if (content.length() > MAX_CONTENT_LENGTH) {
             throw new BusinessException(ErrorCode.CONTENT_TOO_LONG);
         }
-    }
-
-    public Post validatePostExists(Post post) {
-        if (post == null) {
-            throw new PostNotFoundException();
-        }
-        return post;
     }
 }

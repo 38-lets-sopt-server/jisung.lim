@@ -30,6 +30,7 @@ public enum ErrorCode {
     FORBIDDEN_UPDATE(HttpStatus.FORBIDDEN, "본인이 작성한 글만 수정할 수 있습니다."),
 
     // 404 Not Found — 리소스 없음
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 게시글이 존재하지 않거나 삭제되었습니다."),
 
     // 500 Internal Server Error — 서버 오류
