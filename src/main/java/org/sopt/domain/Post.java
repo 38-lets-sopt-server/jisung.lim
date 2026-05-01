@@ -79,7 +79,7 @@ public class Post extends BaseTimeEntity {
         return content;
     }
 
-    public User getuser() {
+    public User getUser() {
         return user;
     }
 
