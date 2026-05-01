@@ -6,8 +6,8 @@ import org.sopt.domain.Post;
 import org.sopt.domain.User;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
-import org.sopt.dto.response.CreatePostResponse;
 import org.sopt.dto.response.PageResponse;
+import org.sopt.dto.response.PostIdResponse;
 import org.sopt.dto.response.PostResponse;
 import org.sopt.exception.BusinessException;
 import org.sopt.exception.PostNotFoundException;
@@ -45,7 +45,7 @@ public class PostService {
     // @Transactional: 메서드 시작 시 트랜잭션이 열리고 정상 종료 시 커밋됨
     //   영속성 컨텍스트가 열려있어 더티 체킹과 LAZY 로딩 정상 동작
     @Transactional
-    public CreatePostResponse createPost(CreatePostRequest request) {
+    public PostIdResponse createPost(CreatePostRequest request) {
         // 입력값 검증 (제목/본문 길이)
         postValidator.validateTitleAndContent(request.title(), request.content());
 
@@ -58,7 +58,7 @@ public class PostService {
         Post post = new Post(request.title(), request.content(), user, request.boardType());
         postRepository.save(post);
 
-        return new CreatePostResponse(post.getId());
+        return new PostIdResponse(post.getId());
     }
 
     // READ - 전체
@@ -105,12 +105,13 @@ public class PostService {
     // 더티 체킹: 영속성 컨텍스트 안에 있는 엔티티를 수정하면 트랜잭션 커밋 시
     // 자동으로 UPDATE 쿼리가 나감, repository.save(post) 명시적으로 호출할 필요 X
     @Transactional
-    public void updatePost(Long id, UpdatePostRequest request) {
+    public PostIdResponse updatePost(Long id, UpdatePostRequest request) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
 
         postValidator.validateTitleAndContent(request.title(), request.content());
         post.update(request.title(), request.content());
 
+        return new PostIdResponse(id);
         // 별도의 save() 호출 없음, 트랜잭션 커밋 시점에 자동 UPDATE
     }
 
@@ -118,8 +119,10 @@ public class PostService {
     // postRepository.delete(post) 호출 시 Post 엔티티의 @SQLDelete에 적용한 쿼리가 실행되어
     // 실제 DELETE가 아니라 'UPDATE post SET ...' 구문이 실행됨 -> 해당 post에 deleted_at 필드가 추가됨
     @Transactional
-    public void deletePost(Long id) {
+    public PostIdResponse deletePost(Long id) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         postRepository.delete(post);
+
+        return new PostIdResponse(id);
     }
 }
