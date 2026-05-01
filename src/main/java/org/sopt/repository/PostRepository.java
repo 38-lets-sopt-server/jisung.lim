@@ -2,11 +2,26 @@ package org.sopt.repository;
 
 import org.sopt.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     // JpaRepository를 상속하면서 기존 2차과제 코드에서 Repository에 구현했던
     // save(), findById(), deleteById() 등의 CRUD 메서드가 불필요해짐
-    // JpaRepository가 기본 CRUD 메서드를 지원해주므로 다 제거
+    // JpaRepository가 기본 CRUD 메서드를 지원해주므로 제거
+
+    // 게시글 + 작성자 + 좋아요를 한 쿼리로 가져온다.
+    // - LEFT JOIN FETCH p.user : Post.user(LAZY)를 즉시 채움 → user 프록시 초기화 쿼리 제거
+    // - LEFT JOIN FETCH p.likes : Post.likes(LAZY 컬렉션)를 즉시 채움 → 좋아요 N+1 쿼리 제거
+    // - DISTINCT : 좋아요 N개에 의해 같은 Post가 N번 결과에 등장하는 cartesian product 중복 제거
+    @Query("""
+            SELECT DISTINCT p
+            FROM Post p
+            LEFT JOIN FETCH p.user
+            LEFT JOIN FETCH p.likes
+            """)
+    List<Post> findAllWithUserAndLikes();
 }
 
 /**
