@@ -1,10 +1,19 @@
 package org.sopt.repository;
 
 import org.sopt.domain.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+@Repository
+public interface PostRepository extends JpaRepository<Post, Long> {
+    // JpaRepository를 상속하면서 기존 2차과제 코드에서 Repository에 구현했던
+    // save(), findById(), deleteById() 등의 CRUD 메서드가 불필요해짐
+    // JpaRepository가 기본 CRUD 메서드를 지원해주므로 다 제거
+}
 
 /**
+ * 2차과제 주석 (JPA 적용 전, Controller와 Service에 DIP 적용한 코드)
+ * <p>
  * 게시글 저장소 추상화
  * <p>
  * 상위 모듈(PostService)은 이 인터페이스에만 의존함으로써 DIP를 충족
@@ -21,16 +30,3 @@ import java.util.List;
  *
  * @Repository 어노테이션은 인터페이스가 아니라 구현체에 붙음 (인터페이스는 인스턴스화 불가).
  */
-public interface PostRepository {
-
-    Post save(Post post);
-
-    List<Post> findAll();
-
-    // TODO: 반환값 Optional<Post>로 전환 고려
-    Post findById(Long id);
-
-    boolean deleteById(Long id);
-
-    Long generateId();
-}
