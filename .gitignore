@@ -44,5 +44,5 @@ bin/
 .DS_Store
 
 ### Environment variables ###
-# .env.example은 협업자가 어떤 환경변수가 필요한지 알 수 있도록 git에 올린다
+# .env.example은 협업자가 어떤 환경변수가 필요한지 알 수 있도록 git 포함
 .env
