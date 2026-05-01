@@ -5,6 +5,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 // 이 클래스를 DB 테이블과 매핑
 @Entity
@@ -48,6 +50,11 @@ public class Post extends BaseTimeEntity {
     // 게시글 삭제 시 @SQLDelete(UPDATE ...) 에서 deletedAt 필드 업데이트
     private LocalDateTime deletedAt;
 
+    // Post : Like = 1 : N (양방향)
+    // mappedBy = "post" : Like 엔티티의 post 필드가 연관관계의 주인.
+    @OneToMany(mappedBy = "post")
+    private List<Like> likes = new ArrayList<>();
+
     // BaseTimeEntity 상속했으므로 createdAt, updatedAt 선언도 필요 없음
     // 접근할 때는 BaseTimeEntity에 선언된 getter인 getCreatedAt(), getUpdatedAt()으로 접근 가능
 
@@ -89,5 +96,9 @@ public class Post extends BaseTimeEntity {
 
     public LocalDateTime getDeletedAt() {
         return deletedAt;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
     }
 }
