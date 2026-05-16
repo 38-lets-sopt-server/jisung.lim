@@ -5,7 +5,7 @@ spring:
   datasource:
     # localhost:3306 = 이 컴퓨터에 떠 있는 MySQL 서버
     # /assignment = 그 서버 안의 'assignment' 데이터베이스
-    url: jdbc:mysql://lgi ocalhost:3306/assignment
+    url: jdbc:mysql://lgiocalhost:3306/assignment
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
