@@ -21,20 +21,14 @@ import org.sopt.common.SuccessCode;
  */
 @Schema(description = "공통 응답 wrapper")
 public record BaseResponse<T>(
-        @Schema(description = "HTTP 상태 코드", example = "200")
-        int status,
+        @Schema(description = "HTTP 상태 코드", example = "200") int status,
 
-        @Schema(description = "비즈니스 코드", example = "POST_DETAIL_FETCH_SUCCESS")
-        String code,
+        @Schema(description = "비즈니스 코드", example = "POST_DETAIL_FETCH_SUCCESS") String code,
 
-        @Schema(description = "응답 메시지", example = "게시글 조회에 성공했습니다.")
-        String message,
+        @Schema(description = "응답 메시지", example = "게시글 조회에 성공했습니다.") String message,
 
-        @Schema(description = "응답 데이터")
-        T data
+        @Schema(description = "응답 데이터") T data
 ) {
-
-    // --- 성공 응답용 정적 팩토리 ---
     // enum + 데이터
     // ex: BaseResponse.success(SuccessCode.POST_DETAIL_FETCH_SUCCESS, postResponse)
     public static <T> BaseResponse<T> success(SuccessCode successCode, T data) {

@@ -5,7 +5,7 @@ spring:
   datasource:
     # localhost:3306 = 이 컴퓨터에 떠 있는 MySQL 서버
     # /assignment = 그 서버 안의 'assignment' 데이터베이스
-    url: jdbc:mysql://localhost:3306/assignment
+    url: jdbc:mysql://lgi ocalhost:3306/assignment
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,7 +22,7 @@ spring:
     # 실행되는 SQL 쿼리를 콘솔에 출력
     show-sql: true
 
-    # Spring Boot가 Caddy가 보내는 X-Forwarded-Proto: https 헤더를 신뢰하도록 설정
-    # -> 이 헤더로 '내가 HTTPS 뒤에 있음'을 인식하고, Swagger도 URL을 HTTPS로 생성 가능
-    server:
-      forward-headers-strategy: framework
+  # Spring Boot가 Caddy가 보내는 X-Forwarded-Proto: https 헤더를 신뢰하도록 설정
+  # -> 이 헤더로 '내가 HTTPS 뒤에 있음'을 인식하고, Swagger도 URL을 HTTPS로 생성 가능
+  server:
+    forward-headers-strategy: framework
