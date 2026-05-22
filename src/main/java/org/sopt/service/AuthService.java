@@ -11,6 +11,7 @@ import org.sopt.exception.BusinessException;
 import org.sopt.repository.RefreshTokenRepository;
 import org.sopt.repository.UserRepository;
 import org.sopt.security.JwtService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,15 +25,18 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthService(
             UserRepository userRepository,
             RefreshTokenRepository refreshTokenRepository,
-            JwtService jwtService
+            JwtService jwtService,
+            PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // 로그인
@@ -45,7 +49,8 @@ public class AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CREDENTIALS));
 
-        if (!user.getPassword().equals(request.password())) {
+        // 평문 비교(.equals) 대신 passwordEncoder의 matches(raw, encoded)로 검증하기
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
         }
 
