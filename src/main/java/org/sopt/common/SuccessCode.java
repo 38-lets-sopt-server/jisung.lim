@@ -20,7 +20,11 @@ public enum SuccessCode {
     POST_UPDATE_SUCCESS(HttpStatus.OK, "게시글이 성공적으로 수정되었습니다."),
     POST_DELETE_SUCCESS(HttpStatus.OK, "게시글이 삭제되었습니다."),
     POST_LIKE_CREATE_SUCCESS(HttpStatus.CREATED, "게시물 좋아요에 성공했습니다."),
-    POST_LIKE_DELETE_SUCCESS(HttpStatus.OK, "게시물 좋아요 해제에 성공했습니다.");
+    POST_LIKE_DELETE_SUCCESS(HttpStatus.OK, "게시물 좋아요 해제에 성공했습니다."),
+
+    // 인증 관련
+    LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
+    REISSUE_SUCCESS(HttpStatus.OK, "토큰이 재발급되었습니다.");
 
     private final HttpStatus status;
     private final String message;
