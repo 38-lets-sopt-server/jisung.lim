@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.List;
 // 토큰이 포함되어 소면 그 토큰에 담긴 정보를 SecurityContext에 넣음
 // 토큰이 없거나/위조되었거나/만료되었으면 SecurityContext를 비우고 다음 작업 넘어감 -> 뒤에서 에러처리
 // OncePerRequestFilter 상속 — 한 요청에서 필터가 한 번만 실행되는 걸 보장
+@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";

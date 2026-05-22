@@ -51,6 +51,8 @@ public class GlobalExceptionHandler {
     // (보안상 e.getMessage()를 그대로 노출하지 않고 일반 메시지 반환)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<Void>> handleException(Exception e) {
+        // 임시 디버깅용
+        e.printStackTrace();
         return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
                 .body(BaseResponse.error(ErrorCode.INTERNAL_SERVER_ERROR));
     }
