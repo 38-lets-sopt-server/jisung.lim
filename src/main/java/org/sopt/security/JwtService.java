@@ -58,6 +58,16 @@ public class JwtService {
                 .sign(algorithm);
     }
 
+    // 만료시간 노출 — AuthService가 TokenResponse 생성 시 사용
+    // 만료시간은 토큰의 속성이므로 JwtService가 알려주는 게 자연스러움
+    public long getAccessTokenExpiresInSeconds() {
+        return accessTokenExpiresInSeconds;
+    }
+
+    public long getRefreshTokenExpiresInSeconds() {
+        return refreshTokenExpiresInSeconds;
+    }
+
     // 토큰 검증 + sub(userId) 추출
     // 검증 실패 시(서명 불일치/만료 등) auth0 라이브러리가 JWTVerificationException 계열 에러 throw
     // -> 그건 호출부(JwtAuthFilter, AuthService.reissue)에서 처리
