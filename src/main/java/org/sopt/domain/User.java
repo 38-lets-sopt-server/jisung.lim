@@ -21,14 +21,18 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(nullable = false, length = 100)
+    private String password;
+
     // JPA는 기본 생성자 반드시 필요
     // protected: JPA는 사용 가능, 외부 코드는 new User()로 빈 객체 만들 수 없음
     protected User() {
     }
 
-    public User(String nickname, String email) {
+    public User(String nickname, String email, String password) {
         this.nickname = nickname;
         this.email = email;
+        this.password = password;
     }
 
     public Long getId() {
@@ -41,5 +45,9 @@ public class User extends BaseTimeEntity {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
