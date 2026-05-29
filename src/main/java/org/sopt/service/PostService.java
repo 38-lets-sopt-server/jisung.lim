@@ -18,19 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Service // Bean으로 관리
+@Service
 public class PostService {
-    // 생성자에서 주입받을 참조만 선언해둠
-    // Spring이 PostService 생성자를 보고 파라미터 타입이 PostRepository, PostValidator임을 확인
-    // -> 이미 Bean으로 등록된 인스턴스를 찾아서 자동으로 넣어줌, '생성자 주입'
-    // private final -> 불변성 보장 (+: final은 이 주소가 바뀌면 안된다는 뜻이지 객체의 내부는 변경 가능)
     private final PostRepository postRepository;
     private final PostValidator postValidator;
     private final UserRepository userRepository;
 
-    // 생성자 주입 코드
-    // Spring이 PostService 인스턴스 생성 시 Bean에서 PostRepository와 PostValidator 찾아서
-    // 생성자의 파라미터에 자동 주입해줌. PostService가 스스로 new X
     public PostService(
             PostRepository postRepository,
             PostValidator postValidator,
@@ -42,19 +35,17 @@ public class PostService {
     }
 
     // CREATE
-    // @Transactional: 메서드 시작 시 트랜잭션이 열리고 정상 종료 시 커밋됨
-    //   영속성 컨텍스트가 열려있어 더티 체킹과 LAZY 로딩 정상 동작
+    // userId는 컨트롤러에서 @AuthenticationPrincipal로 받아온 JWT의 userId
+    // 더 이상 CreatePostRequest의 userId 필드 사용 X
     @Transactional
-    public PostIdResponse createPost(CreatePostRequest request) {
-        // 입력값 검증 (제목/본문 길이)
+    public PostIdResponse createPost(Long userId, CreatePostRequest request) {
         postValidator.validateTitleAndContent(request.title(), request.content());
 
-        // userId로 User 엔티티 조회, 없으면 USER_NOT_FOUND 예외
-        // JpaRepository의 findById()는 Optional을 반환하므로 에러 throw해야함
-        User user = userRepository.findById(request.userId())
+        // 토큰의 userId로 User 조회 — 정상 토큰이면 항상 존재해야 함
+        // +) 그래도 방어 차원에서 USER_NOT_FOUND 처리
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        // 새 post 생성 (id와 createdAt은 JPA가 자동 처리)
         Post post = new Post(request.title(), request.content(), user, request.boardType());
         postRepository.save(post);
 
@@ -62,67 +53,60 @@ public class PostService {
     }
 
     // READ - 전체
-    // readOnly = true -> 트랜잭션을 읽기 전용으로 표시, 더티 체킹 건너뛰어 약간의 성능 이점
     @Transactional(readOnly = true)
     public PageResponse<PostResponse> getAllPosts(int page, int size, BoardType boardType) {
-        // 1. 전체 게시글 가져오기
         List<Post> all = postRepository.findAllWithUserAndLikes();
 
-        // 2. boardType 필터링 (null이면 전체, 아니면 일치하는 게시글만)
-        // boardType == null이면 filter() 조건이 true가 되어 전체 게시글 반환
-        // boardType == 'HOT'이면 boardType == null가 false이므로 p.getBoardType() == boardType을 만족하는
-        // 리스트만 반환
         List<Post> filtered = all.stream()
                 .filter(p -> boardType == null || p.getBoardType() == boardType)
                 .toList();
 
-        // 3. 페이지 슬라이싱
         int from = page * size;
         int to = Math.min(from + size, filtered.size());
         List<Post> pageSlice = from >= filtered.size() ? List.of() : filtered.subList(from, to);
 
-        // 4. DTO 반환
         List<PostResponse> content = pageSlice.stream().map(PostResponse::from).toList();
-
-        // 5. hasNext 계산 (다음 페이지 존재 여부)
         boolean hasNext = to < filtered.size();
 
-        // 6. PageResponse 생성
-        // 요청/응답 순간에만 존재, 불변(상태 없음), 매 요청마다 다른 데이터로 새로 만들어지는게 정상, Spring이 관리할 필요 없음
-        // => Spring DI의 관리 대상 X, new 사용하는게 당연함
         return new PageResponse<PostResponse>(content, page, size, hasNext);
     }
 
     // READ - 단건
     @Transactional(readOnly = true)
     public PostResponse getPost(Long id) {
-        // PostNotFoundException::new == 람다를 짧게 쓴 것 == () => new PostNotFoundException()
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         return PostResponse.from(post);
     }
 
-    // UPDATE
+    // UPDATE — 본인 글만 수정 가능
     // 더티 체킹: 영속성 컨텍스트 안에 있는 엔티티를 수정하면 트랜잭션 커밋 시
     // 자동으로 UPDATE 쿼리가 나감, repository.save(post) 명시적으로 호출할 필요 X
     @Transactional
-    public PostIdResponse updatePost(Long id, UpdatePostRequest request) {
+    public PostIdResponse updatePost(Long userId, Long id, UpdatePostRequest request) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+
+        // 본인 글 검증 — 토큰의 userId !== 게시글 작성자 userId면 403
+        if (!post.getUser().getId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_UPDATE);
+        }
 
         postValidator.validateTitleAndContent(request.title(), request.content());
         post.update(request.title(), request.content());
 
         return new PostIdResponse(id);
-        // 별도의 save() 호출 없음, 트랜잭션 커밋 시점에 자동 UPDATE
     }
 
-    // DELETE
-    // postRepository.delete(post) 호출 시 Post 엔티티의 @SQLDelete에 적용한 쿼리가 실행되어
-    // 실제 DELETE가 아니라 'UPDATE post SET ...' 구문이 실행됨 -> 해당 post에 deleted_at 필드가 추가됨
+    // DELETE — 본인 글만 삭제 가능
     @Transactional
-    public PostIdResponse deletePost(Long id) {
+    public PostIdResponse deletePost(Long userId, Long id) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
-        postRepository.delete(post);
 
+        // 본인 글 검증 — 다른 사람 글 삭제 시도 시 403
+        if (!post.getUser().getId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_DELETE);
+        }
+
+        postRepository.delete(post);
         return new PostIdResponse(id);
     }
 }
